@@ -1,0 +1,48 @@
+name: CI DevSecOps
+
+# Integracion continua: se ejecuta en cada push y pull request a main.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout del codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # --- Calidad de codigo ---
+      - name: Lint (ruff)
+        run: ruff check .
+
+      # --- Pruebas automaticas ---
+      - name: Pruebas (pytest)
+        run: pytest -q
+
+      # --- Escaneo de seguridad estatico (SAST) ---
+      - name: Analisis de seguridad (Bandit)
+        run: bandit -r app -ll
+
+      # --- Vulnerabilidades en dependencias ---
+      # Informativo: no rompe el build en etapas tempranas del proyecto.
+      - name: Auditoria de dependencias (pip-audit)
+        continue-on-error: true
+        run: pip-audit
