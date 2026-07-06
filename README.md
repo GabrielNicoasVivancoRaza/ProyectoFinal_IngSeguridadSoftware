@@ -46,9 +46,15 @@ pip install -r requirements.txt
 # Configurar variables de entorno
 cp .env.example .env   # y ajustar DATABASE_URL / SECRET_KEY
 
+# Crear las tablas en PostgreSQL (migraciones Alembic)
+alembic upgrade head
+
 # Ejecutar la API
 uvicorn app.main:app --reload
 ```
+
+> Para crear una nueva migración tras cambiar los modelos:
+> `alembic revision --autogenerate -m "descripcion del cambio"` y luego `alembic upgrade head`.
 
 - API: http://localhost:8000
 - Documentación interactiva (Swagger): http://localhost:8000/docs
