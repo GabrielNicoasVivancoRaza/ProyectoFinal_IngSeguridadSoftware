@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Variables de entorno y secretos (NUNCA subir)
+.env
+*.env
+!*.env.example
+
+# Claves criptográficas y certificados (NUNCA subir)
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets/
+keys/
+
+# Bases de datos locales
+*.sqlite3
+*.db
+
+# Almacenamiento de documentos subidos
+backend/storage/
+uploads/
+
+# IDE / SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
