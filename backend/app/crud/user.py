@@ -2,7 +2,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.core.security import hash_password
+from app.core.security import hash_password, verify_password
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
 
@@ -57,3 +57,13 @@ def soft_delete_user(db: Session, user: User) -> None:
     """Eliminacion logica: el usuario se marca como inactivo, no se borra fisicamente."""
     user.is_active = False
     db.commit()
+
+
+def authenticate(db: Session, username: str, password: str) -> User | None:
+    """Valida credenciales: devuelve el usuario si existe, esta activo y la clave coincide."""
+    user = get_user_by_username(db, username)
+    if user is None or not user.is_active:
+        return None
+    if not verify_password(password, user.password_hash):
+        return None
+    return user

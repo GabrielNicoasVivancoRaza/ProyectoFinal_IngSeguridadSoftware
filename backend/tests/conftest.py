@@ -34,3 +34,17 @@ def client(tmp_path):
     app.dependency_overrides[get_db] = override_get_db
     yield TestClient(app)
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def auth_headers(client):
+    """Registra un usuario, inicia sesion y devuelve los headers con el token JWT."""
+    client.post(
+        "/auth/register",
+        json={"username": "bob", "email": "bob@example.com", "password": "supersegura1"},
+    )
+    token = client.post(
+        "/auth/login",
+        data={"username": "bob", "password": "supersegura1"},
+    ).json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
