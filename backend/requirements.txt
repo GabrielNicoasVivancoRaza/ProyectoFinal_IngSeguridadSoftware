@@ -5,6 +5,7 @@ uvicorn[standard]==0.34.0
 # --- Configuración y validación ---
 pydantic==2.10.4
 pydantic-settings==2.7.1
+email-validator==2.2.0
 
 # --- Base de datos ---
 sqlalchemy==2.0.36
@@ -13,7 +14,9 @@ psycopg2-binary==2.9.10
 
 # --- Seguridad / criptografía ---
 cryptography==44.0.0
-passlib[bcrypt]==1.7.4
+passlib==1.7.4
+# bcrypt fijado a 4.0.1: passlib 1.7.4 es incompatible con bcrypt >=4.1
+bcrypt==4.0.1
 python-jose[cryptography]==3.3.0
 python-multipart==0.0.20
 

@@ -6,6 +6,8 @@ extend-exclude = ["migrations/versions"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
+# B008: Depends() en argumentos por defecto es el patron idiomatico de FastAPI.
+ignore = ["B008"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

@@ -1,6 +1,7 @@
 """Punto de entrada de la API FastAPI."""
 from fastapi import FastAPI
 
+from app.api.routes import users
 from app.core.config import settings
 
 app = FastAPI(
@@ -8,6 +9,8 @@ app = FastAPI(
     description="Plataforma web segura de firma digital y validacion criptografica (DevSecOps).",
     version="0.1.0",
 )
+
+app.include_router(users.router)
 
 
 @app.get("/", tags=["general"])
