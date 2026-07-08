@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     # Base de datos
     database_url: str = "postgresql+psycopg2://postgres:postgres@localhost:5432/firma_digital"
 
+    # Almacenamiento de archivos subidos
+    storage_dir: str = "storage"
+
     # Seguridad / JWT
     secret_key: str = "cambia-esta-clave"
     access_token_expire_minutes: int = 60

@@ -1,7 +1,7 @@
 """Punto de entrada de la API FastAPI."""
 from fastapi import FastAPI
 
-from app.api.routes import users
+from app.api.routes import documents, users
 from app.core.config import settings
 
 app = FastAPI(
@@ -11,6 +11,7 @@ app = FastAPI(
 )
 
 app.include_router(users.router)
+app.include_router(documents.router)
 
 
 @app.get("/", tags=["general"])

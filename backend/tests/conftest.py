@@ -6,12 +6,16 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 import app.models  # noqa: F401  (registra los modelos en Base.metadata)
+from app.core.config import settings
 from app.db.session import Base, get_db
 from app.main import app
 
 
 @pytest.fixture
-def client():
+def client(tmp_path):
+    # Redirige el almacenamiento de archivos a un directorio temporal por prueba.
+    settings.storage_dir = str(tmp_path / "storage")
+
     engine = create_engine(
         "sqlite://",
         connect_args={"check_same_thread": False},
