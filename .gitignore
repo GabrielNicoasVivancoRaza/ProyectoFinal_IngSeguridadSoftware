@@ -36,6 +36,10 @@ keys/
 backend/storage/
 uploads/
 
+# Datos de la Autoridad Certificadora (clave y certificado raiz)
+backend/ca_data/
+ca_data/
+
 # IDE / SO
 .vscode/
 .idea/

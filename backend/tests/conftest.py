@@ -13,8 +13,9 @@ from app.main import app
 
 @pytest.fixture
 def client(tmp_path):
-    # Redirige el almacenamiento de archivos a un directorio temporal por prueba.
+    # Redirige almacenamiento y datos de la CA a directorios temporales por prueba.
     settings.storage_dir = str(tmp_path / "storage")
+    settings.ca_dir = str(tmp_path / "ca")
 
     engine = create_engine(
         "sqlite://",

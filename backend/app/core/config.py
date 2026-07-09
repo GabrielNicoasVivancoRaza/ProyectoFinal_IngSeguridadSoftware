@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     # Almacenamiento de archivos subidos
     storage_dir: str = "storage"
 
+    # Directorio de la Autoridad Certificadora (clave y certificado raiz)
+    ca_dir: str = "ca_data"
+
     # Seguridad / JWT
     secret_key: str = "cambia-esta-clave"
     access_token_expire_minutes: int = 60
