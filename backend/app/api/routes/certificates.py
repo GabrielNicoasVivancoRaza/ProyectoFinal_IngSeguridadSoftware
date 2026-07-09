@@ -2,7 +2,7 @@
 
 Emitir, consultar, validar (confianza + vigencia) y revocar. Requieren autenticacion.
 """
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
@@ -15,12 +15,14 @@ from app.schemas.certificate import (
     CertificateRead,
     CertificateValidation,
 )
+from app.services.audit import record
 
 router = APIRouter(prefix="/certificates", tags=["certificados"])
 
 
 @router.post("", response_model=CertificateIssued, status_code=status.HTTP_201_CREATED)
 def emit_certificate(
+    request: Request,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> CertificateIssued:
@@ -31,6 +33,7 @@ def emit_certificate(
     cert = crud.create_certificate(
         db, current_user.id, serial, public_pem, cert_pem, expires_at
     )
+    record(db, "cert_issue", detail=serial, user_id=current_user.id, request=request)
     return CertificateIssued(
         id=cert.id,
         user_id=cert.user_id,
@@ -98,10 +101,13 @@ def validate(
 @router.post("/{cert_id}/revoke", response_model=CertificateRead)
 def revoke_certificate(
     cert_id: int,
+    request: Request,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> CertificateRead:
     cert = crud.get_certificate(db, cert_id)
     if cert is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Certificado no encontrado")
-    return crud.set_status(db, cert, "revoked")
+    revocado = crud.set_status(db, cert, "revoked")
+    record(db, "cert_revoke", detail=cert.serial, user_id=current_user.id, request=request)
+    return revocado

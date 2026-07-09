@@ -4,7 +4,7 @@ Todos los endpoints requieren autenticacion (JWT).
 """
 import os
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
@@ -13,6 +13,7 @@ from app.crypto.hashing import sha256_bytes, sha256_file
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.document import DocumentRead, IntegrityCheck
+from app.services.audit import record
 from app.services.storage import save_upload
 
 router = APIRouter(prefix="/documents", tags=["documentos"])
@@ -20,6 +21,7 @@ router = APIRouter(prefix="/documents", tags=["documentos"])
 
 @router.post("", response_model=DocumentRead, status_code=status.HTTP_201_CREATED)
 async def upload_document(
+    request: Request,
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -28,7 +30,9 @@ async def upload_document(
     sha256 = sha256_bytes(content)
     filename = file.filename or "archivo"
     storage_path = save_upload(content, filename)
-    return crud.create_document(db, current_user.id, filename, storage_path, sha256)
+    doc = crud.create_document(db, current_user.id, filename, storage_path, sha256)
+    record(db, "document_upload", detail=filename, user_id=current_user.id, request=request)
+    return doc
 
 
 @router.get("", response_model=list[DocumentRead])
@@ -55,6 +59,7 @@ def get_document(
 @router.get("/{document_id}/verify", response_model=IntegrityCheck)
 def verify_document(
     document_id: int,
+    request: Request,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> IntegrityCheck:
@@ -74,6 +79,13 @@ def verify_document(
 
     actual = sha256_file(doc.storage_path)
     valid = actual == doc.sha256
+    record(
+        db,
+        "document_verify",
+        detail=f"doc={doc.id} valid={valid}",
+        user_id=current_user.id,
+        request=request,
+    )
     return IntegrityCheck(
         document_id=doc.id,
         stored_sha256=doc.sha256,

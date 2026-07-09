@@ -1,7 +1,7 @@
 """Punto de entrada de la API FastAPI."""
 from fastapi import FastAPI
 
-from app.api.routes import auth, certificates, crypto, documents, users
+from app.api.routes import audit, auth, certificates, crypto, documents, users
 from app.core.config import settings
 
 app = FastAPI(
@@ -15,6 +15,7 @@ app.include_router(users.router)
 app.include_router(documents.router)
 app.include_router(crypto.router)
 app.include_router(certificates.router)
+app.include_router(audit.router)
 
 
 @app.get("/", tags=["general"])
