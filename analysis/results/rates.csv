@@ -1,0 +1,6 @@
+metric,successes,total,rate_pct
+Deteccion por hash SHA-256,50,50,100.0
+Deteccion por firma digital,50,50,100.0
+Deteccion por AES-GCM (tag),50,50,100.0
+Autenticacion exitosa (clave correcta),15,15,100.0
+Rechazo correcto (clave incorrecta),15,15,100.0
