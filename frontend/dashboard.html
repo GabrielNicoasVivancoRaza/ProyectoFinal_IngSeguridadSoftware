@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel — Plataforma Segura de Firma Digital</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header>
+    <strong>Plataforma Segura de Firma Digital</strong>
+    <div class="row">
+      <span class="user">Sesión: <b id="current-user"></b></span>
+      <button class="secondary" id="logout">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <nav>
+    <button class="tab active" data-tab="documents">Documentos</button>
+    <button class="tab" data-tab="cipher">Cifrado AES</button>
+    <button class="tab" data-tab="signature">Firma RSA</button>
+    <button class="tab" data-tab="certificates">Certificados</button>
+    <button class="tab" data-tab="audit">Auditoría</button>
+  </nav>
+
+  <main>
+    <!-- ================= DOCUMENTOS ================= -->
+    <section id="documents" class="active">
+      <div class="panel">
+        <h2>Subir documento</h2>
+        <p class="subtitle">Al subirlo se calcula su hash SHA-256 para verificar integridad.</p>
+        <form id="upload-form">
+          <label for="doc-file">Archivo</label>
+          <input id="doc-file" type="file" required />
+          <button type="submit">Subir</button>
+          <p class="msg" id="upload-msg"></p>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Mis documentos</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>Archivo</th><th>SHA-256</th><th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="documents-body"></tbody>
+          </table>
+        </div>
+        <p class="msg" id="documents-msg"></p>
+      </div>
+    </section>
+
+    <!-- ================= CIFRADO AES ================= -->
+    <section id="cipher">
+      <div class="panel">
+        <h2>Cifrar archivo (AES-256-GCM)</h2>
+        <p class="subtitle">La clave se deriva de tu contraseña con PBKDF2. Descarga el archivo .enc</p>
+        <form id="encrypt-form">
+          <label for="enc-file">Archivo</label>
+          <input id="enc-file" type="file" required />
+          <label for="enc-password">Contraseña de cifrado (mínimo 8)</label>
+          <input id="enc-password" type="password" required minlength="8" />
+          <button type="submit">Cifrar y descargar</button>
+          <p class="msg" id="encrypt-msg"></p>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Descifrar archivo</h2>
+        <p class="subtitle">Si la contraseña es incorrecta o el archivo fue alterado, fallará.</p>
+        <form id="decrypt-form">
+          <label for="dec-file">Archivo cifrado (.enc)</label>
+          <input id="dec-file" type="file" required />
+          <label for="dec-password">Contraseña</label>
+          <input id="dec-password" type="password" required minlength="8" />
+          <button type="submit">Descifrar y descargar</button>
+          <p class="msg" id="decrypt-msg"></p>
+        </form>
+      </div>
+    </section>
+
+    <!-- ================= FIRMA RSA ================= -->
+    <section id="signature">
+      <div class="panel">
+        <h2>Generar par de claves RSA-2048</h2>
+        <p class="subtitle">La clave privada solo se muestra una vez. Guárdala de forma segura.</p>
+        <button id="genkeys-btn">Generar claves</button>
+        <label for="priv-key">Clave privada (PEM)</label>
+        <textarea id="priv-key" placeholder="Pega aquí tu clave privada para firmar"></textarea>
+        <label for="pub-key">Clave pública (PEM)</label>
+        <textarea id="pub-key" placeholder="Pega aquí la clave pública para verificar"></textarea>
+      </div>
+
+      <div class="panel">
+        <h2>Firmar documento</h2>
+        <form id="sign-form">
+          <label for="sign-file">Archivo a firmar</label>
+          <input id="sign-file" type="file" required />
+          <button type="submit">Firmar (RSA-PSS + SHA-256)</button>
+          <p class="msg" id="sign-msg"></p>
+        </form>
+        <label for="signature-b64">Firma (base64)</label>
+        <textarea id="signature-b64" placeholder="Aquí aparecerá la firma generada"></textarea>
+      </div>
+
+      <div class="panel">
+        <h2>Verificar firma</h2>
+        <p class="subtitle">Usa la clave pública y la firma de arriba. Si el documento fue alterado, la firma será inválida.</p>
+        <form id="verify-form">
+          <label for="verify-file">Archivo a verificar</label>
+          <input id="verify-file" type="file" required />
+          <button type="submit">Verificar firma</button>
+          <p class="msg" id="verify-msg"></p>
+        </form>
+      </div>
+    </section>
+
+    <!-- ================= CERTIFICADOS ================= -->
+    <section id="certificates">
+      <div class="panel">
+        <h2>Emitir certificado digital</h2>
+        <p class="subtitle">La CA simulada emite un certificado X.509 firmado y con expiración.</p>
+        <button id="issue-cert-btn">Emitir certificado</button>
+        <p class="msg" id="cert-msg"></p>
+        <label for="cert-pem" hidden id="cert-pem-label">Certificado emitido (PEM)</label>
+        <textarea id="cert-pem" hidden></textarea>
+      </div>
+
+      <div class="panel">
+        <h2>Mis certificados</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>Serial</th><th>Estado</th><th>Expira</th><th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="certificates-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= AUDITORÍA ================= -->
+    <section id="audit">
+      <div class="panel">
+        <h2>Registro de auditoría</h2>
+        <p class="subtitle">Accesos, eventos criptográficos y validaciones.</p>
+        <button class="secondary" id="refresh-audit">Actualizar</button>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th><th>Evento</th><th>Detalle</th><th>IP</th>
+              </tr>
+            </thead>
+            <tbody id="audit-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

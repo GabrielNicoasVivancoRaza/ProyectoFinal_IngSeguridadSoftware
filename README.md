@@ -60,6 +60,21 @@ uvicorn app.main:app --reload
 - Documentación interactiva (Swagger): http://localhost:8000/docs
 - Health check: http://localhost:8000/health
 
+## Puesta en marcha (frontend)
+
+El frontend es HTML/CSS/JS puro (sin build). Sírvelo desde su carpeta:
+
+```bash
+cd frontend
+python -m http.server 5500
+```
+
+Abre http://localhost:5500 — permite registrarse, iniciar sesión y usar todos los módulos:
+documentos (subir/verificar/eliminar), cifrado AES, firma RSA, certificados y auditoría.
+
+> El backend habilita CORS (`CORS_ALLOW_ORIGINS`, por defecto `*` en desarrollo).
+> Si el backend no corre en `localhost:8000`, ajusta `API_BASE` en `frontend/js/api.js`.
+
 ## Pruebas
 
 ```bash

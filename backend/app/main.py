@@ -1,5 +1,6 @@
 """Punto de entrada de la API FastAPI."""
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes import audit, auth, certificates, crypto, documents, users
 from app.core.config import settings
@@ -8,6 +9,15 @@ app = FastAPI(
     title=settings.app_name,
     description="Plataforma web segura de firma digital y validacion criptografica (DevSecOps).",
     version="0.1.0",
+)
+
+# Permite que el frontend (otro origen) consuma la API.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origins_list,
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth.router)

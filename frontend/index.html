@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plataforma Segura de Firma Digital</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="card">
+      <h1>Plataforma Segura de Firma Digital</h1>
+      <p class="subtitle">Criptografía aplicada y validación de documentos</p>
+
+      <!-- Formulario de inicio de sesión -->
+      <form id="login-form">
+        <h2>Iniciar sesión</h2>
+        <label for="login-username">Usuario</label>
+        <input id="login-username" type="text" required autocomplete="username" />
+
+        <label for="login-password">Contraseña</label>
+        <input id="login-password" type="password" required autocomplete="current-password" />
+
+        <button type="submit">Entrar</button>
+        <p class="msg" id="login-msg"></p>
+        <button type="button" class="link" id="show-register">
+          ¿No tienes cuenta? Regístrate
+        </button>
+      </form>
+
+      <!-- Formulario de registro -->
+      <form id="register-form" hidden>
+        <h2>Crear cuenta</h2>
+        <label for="reg-username">Usuario</label>
+        <input id="reg-username" type="text" required minlength="3" />
+
+        <label for="reg-email">Correo</label>
+        <input id="reg-email" type="email" required />
+
+        <label for="reg-password">Contraseña (mínimo 8 caracteres)</label>
+        <input id="reg-password" type="password" required minlength="8" />
+
+        <button type="submit">Registrarme</button>
+        <p class="msg" id="reg-msg"></p>
+        <button type="button" class="link" id="show-login">
+          ¿Ya tienes cuenta? Inicia sesión
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>
