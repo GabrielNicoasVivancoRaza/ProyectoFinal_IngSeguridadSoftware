@@ -46,3 +46,27 @@ jobs:
       - name: Auditoria de dependencias (pip-audit)
         continue-on-error: true
         run: pip-audit
+
+  # ==================================================================
+  # Escaneo de la imagen Docker con Trivy (vulnerabilidades del contenedor)
+  # ==================================================================
+  docker-scan:
+    runs-on: ubuntu-latest
+    needs: build-and-scan
+
+    steps:
+      - name: Checkout del codigo
+        uses: actions/checkout@v4
+
+      - name: Construir la imagen del backend
+        run: docker build -t firma-backend:${{ github.sha }} ./backend
+
+      - name: Escaneo de vulnerabilidades (Trivy)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: firma-backend:${{ github.sha }}
+          format: table
+          severity: HIGH,CRITICAL
+          # Informativo por ahora: no rompe el build.
+          # Cambiar a '1' para bloquear ante vulnerabilidades HIGH/CRITICAL.
+          exit-code: "0"

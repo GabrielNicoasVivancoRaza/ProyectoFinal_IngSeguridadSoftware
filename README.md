@@ -82,6 +82,20 @@ cd backend
 pytest
 ```
 
+## Despliegue con Docker (Ubuntu Server)
+
+Levanta el backend + PostgreSQL con un solo comando:
+
+```bash
+cd infra
+cp .env.example .env          # ajusta POSTGRES_PASSWORD y SECRET_KEY
+docker compose up -d --build
+```
+
+- API: http://localhost:8000 (las migraciones se aplican solas al arrancar)
+- PostgreSQL: puerto `5432` expuesto para administrarlo desde **pgAdmin4**
+- La imagen corre con **usuario sin privilegios** y los datos (documentos + CA) persisten en volúmenes
+
 ## Análisis de seguridad (local)
 
 ```bash

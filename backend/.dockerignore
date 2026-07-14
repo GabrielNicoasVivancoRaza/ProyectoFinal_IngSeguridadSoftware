@@ -1,0 +1,21 @@
+# No copiar entorno local, secretos ni datos a la imagen.
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Secretos y claves: NUNCA dentro de la imagen
+.env
+*.pem
+*.key
+ca_data/
+
+# Datos locales
+storage/
+*.sqlite3
+*.db
+
+# Pruebas (no se necesitan en produccion)
+tests/

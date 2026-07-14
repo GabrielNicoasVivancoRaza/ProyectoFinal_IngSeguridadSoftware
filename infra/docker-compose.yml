@@ -1,0 +1,53 @@
+# Despliegue del backend + PostgreSQL (pensado para el Ubuntu Server del entorno virtualizado).
+# Uso:  cd infra && cp .env.example .env && docker compose up -d --build
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: firma_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?define POSTGRES_PASSWORD en .env}
+      POSTGRES_DB: ${POSTGRES_DB:-firma_digital}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Puerto expuesto para poder administrar la BD desde pgAdmin4.
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ../backend
+    container_name: firma_backend
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-firma_digital}
+      SECRET_KEY: ${SECRET_KEY:?define SECRET_KEY en .env}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-60}
+      CORS_ALLOW_ORIGINS: ${CORS_ALLOW_ORIGINS:-*}
+      STORAGE_DIR: /app/storage
+      CA_DIR: /app/ca_data
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persisten los documentos subidos y la clave/certificado de la CA.
+      - storage:/app/storage
+      - ca_data:/app/ca_data
+    # Aplica las migraciones antes de levantar la API.
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  storage:
+  ca_data:
